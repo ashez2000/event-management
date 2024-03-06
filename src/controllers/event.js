@@ -68,3 +68,44 @@ export const remove = async (req, res) => {
 
   res.status(200).json({ event })
 }
+
+export const register = async (req, res) => {
+  const eventId = req.params.eventId
+  const userId = req.user.id
+
+  const event = await db.event.findUnique({
+    where: {
+      id: eventId,
+    },
+  })
+
+  if (!event) {
+    throw new AppError('Event not found', 404)
+  }
+
+  const registered = await db.eventRegister.findUnique({
+    where: {
+      eventId_userId: {
+        eventId,
+        userId,
+      },
+    },
+  })
+
+  if (registered) {
+    throw new AppError('Already registered', 400)
+  }
+
+  await db.eventRegister.create({
+    data: {
+      eventId,
+      userId,
+    },
+  })
+
+  // TODO: Send email
+
+  res.status(201).json({
+    message: 'Registered to event successfully',
+  })
+}

@@ -12,10 +12,24 @@ model User {
   name     String
   email    String @unique
   password String
+
+  registrations EventRegister[]
 }
 
 model Event {
   id          String @id @default(uuid())
   name        String @unique
   description String
+
+  participants EventRegister[]
+}
+
+model EventRegister {
+  eventId String
+  userId  String
+
+  event Event @relation(fields: [eventId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@id([eventId, userId])
 }

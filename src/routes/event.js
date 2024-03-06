@@ -11,4 +11,6 @@ router.get('/:id', event.findById)
 router.put('/:id', authenticate, event.update)
 router.delete('/:id', authenticate, event.remove)
 
+router.post('/:eventId/register', authenticate, event.register)
+
 export default router
