@@ -4,6 +4,7 @@ import 'express-async-errors'
 
 import { errorHandler, notFound } from './middlewares/error.js'
 import authRoutes from './routes/auth.js'
+import eventRoutes from './routes/event.js'
 
 const app = express()
 
@@ -15,6 +16,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/auth', authRoutes)
+app.use('/api/events', eventRoutes)
 
 app.use(notFound)
 app.use(errorHandler)

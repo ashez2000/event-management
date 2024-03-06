@@ -13,3 +13,9 @@ model User {
   email    String @unique
   password String
 }
+
+model Event {
+  id          String @id @default(uuid())
+  name        String @unique
+  description String
+}
