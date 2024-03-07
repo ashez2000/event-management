@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 
 import { AppError } from '../utils/app-error.js'
 import db from '../utils/prisma.js'
+import { registerSchema, loginSchema } from '../schemas/user.js'
 
 const signToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET, {
@@ -11,7 +12,7 @@ const signToken = (id, role) => {
 }
 
 export const register = async (req, res) => {
-  const { name, email, password, role } = req.body
+  const { name, email, password, role } = registerSchema.parse(req.body)
   const hash = bcrypt.hashSync(password)
 
   const emailTaken = await db.user.findUnique({ where: { email } })
@@ -34,7 +35,7 @@ export const register = async (req, res) => {
 }
 
 export const login = async (req, res) => {
-  const { email, password } = req.body
+  const { email, password } = loginSchema.parse(req.body)
 
   const user = await db.user.findUnique({
     where: {
