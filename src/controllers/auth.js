@@ -1,26 +1,34 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+
+import { AppError } from '../utils/app-error.js'
 import db from '../utils/prisma.js'
 
-const signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+const signToken = (id, role) => {
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, {
     expiresIn: '8h',
   })
 }
 
 export const register = async (req, res) => {
-  const { name, email, password } = req.body
+  const { name, email, password, role } = req.body
   const hash = bcrypt.hashSync(password)
+
+  const emailTaken = await db.user.findUnique({ where: { email } })
+  if (emailTaken) {
+    throw new AppError('Email already exists', 400)
+  }
 
   const user = await db.user.create({
     data: {
       name,
       email,
       password: hash,
+      role,
     },
   })
 
-  const token = signToken(user.id)
+  const token = signToken(user.id, user.role)
 
   res.status(201).json({ token })
 }
@@ -46,7 +54,7 @@ export const login = async (req, res) => {
     })
   }
 
-  const token = signToken(user.id)
+  const token = signToken(user.id, user.role)
 
   res.status(200).json({ token })
 }
