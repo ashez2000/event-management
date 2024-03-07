@@ -1,5 +1,6 @@
 import db from '../utils/prisma.js'
 import { AppError } from '../utils/app-error.js'
+import { sendEmail } from '../utils/email.js'
 
 export const findMany = async (req, res) => {
   const events = await db.event.findMany()
@@ -103,7 +104,19 @@ export const register = async (req, res) => {
     },
   })
 
-  // TODO: Send email
+  const user = await db.user.findUnique({
+    where: {
+      id: req.user.id,
+    },
+  })
+
+  const info = await sendEmail(
+    user.email,
+    'Registration successful',
+    'Successfully registered for event: ' + event.name
+  )
+
+  console.log('email: ', info)
 
   res.status(201).json({
     message: 'Registered to event successfully',
