@@ -14,6 +14,7 @@ model User {
   password String
   role     String @default("user")
 
+  events        Event[]
   registrations EventRegister[]
 }
 
@@ -21,7 +22,9 @@ model Event {
   id          String @id @default(uuid())
   name        String @unique
   description String
+  organizerId String
 
+  organizer    User            @relation(fields: [organizerId], references: [id])
   participants EventRegister[]
 }
 

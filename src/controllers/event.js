@@ -42,6 +42,10 @@ export const update = async (req, res) => {
     throw new AppError('Event not found', 404)
   }
 
+  if (found.organizerId !== req.user.id) {
+    throw new AppError('Unauthorized', 403)
+  }
+
   const event = await db.event.update({
     where: {
       id: req.params.id,
@@ -59,6 +63,10 @@ export const remove = async (req, res) => {
   const found = await db.event.findUnique({ where: { id: req.params.id } })
   if (!found) {
     throw new AppError('Event not found', 404)
+  }
+
+  if (found.organizerId !== req.user.id) {
+    throw new AppError('Unauthorized', 403)
   }
 
   const event = await db.event.delete({
