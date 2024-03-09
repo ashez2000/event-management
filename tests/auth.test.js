@@ -18,6 +18,41 @@ describe('Register user', () => {
 
     assert.equal(res.statusCode, 201)
   })
+
+  test('User registration with invalid data', async () => {
+    const tests = [
+      { name: 'John Doe', password: '123456' },
+      { name: 'John Doe', email: 'invalidemail', password: '123456' },
+      { name: 'John Doe', email: 'john@gmail.com' },
+      { email: 'john@gmail.com', password: '123456' },
+    ]
+
+    for (let i of tests) {
+      const res = await supertest(app).post('/api/auth/register').send(i)
+      assert.equal(res.status, 400)
+    }
+  })
+
+  test('Unique email', async () => {
+    await db.user.create({
+      data: {
+        name: 'John Doe',
+        email: 'john@gmail.com',
+        password: bcrypt.hashSync('123456'),
+      },
+    })
+
+    const res = await supertest(app)
+      .post('/api/auth/register')
+      .send({
+        name: 'John Doe',
+        email: 'john@gmail.com',
+        password: bcrypt.hashSync('123456'),
+      })
+
+    assert.equal(res.status, 400)
+    assert.equal(res.body.message, 'Email already exists')
+  })
 })
 
 describe('Login user', () => {
