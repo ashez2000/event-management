@@ -19,9 +19,10 @@ model User {
 }
 
 model Event {
-  id          String @id @default(uuid())
-  name        String @unique
+  id          String   @id @default(uuid())
+  name        String   @unique
   description String
+  date        DateTime
   organizerId String
 
   organizer    User            @relation(fields: [organizerId], references: [id])

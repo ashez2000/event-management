@@ -1,6 +1,7 @@
 import db from '../utils/prisma.js'
 import { AppError } from '../utils/app-error.js'
 import { sendEmail } from '../utils/email.js'
+import { eventSchema } from '../schemas/event.js'
 
 export const findMany = async (req, res) => {
   const events = await db.event.findMany()
@@ -22,12 +23,13 @@ export const findById = async (req, res) => {
 }
 
 export const create = async (req, res) => {
-  const { name, description } = req.body
+  const { name, description, date } = eventSchema.parse(req.body)
 
   const event = await db.event.create({
     data: {
       name,
       description,
+      date,
     },
   })
 
@@ -35,7 +37,7 @@ export const create = async (req, res) => {
 }
 
 export const update = async (req, res) => {
-  const { name, description } = req.body
+  const { name, description, date } = req.body
 
   const found = await db.event.findUnique({ where: { id: req.params.id } })
   if (!found) {
@@ -53,6 +55,7 @@ export const update = async (req, res) => {
     data: {
       name,
       description,
+      date,
     },
   })
 
